@@ -1,43 +1,35 @@
 using Microsoft.EntityFrameworkCore;
 using Airport.Models;
-
 namespace Airport.Data
 {
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Aircraft> Aircrafts { get; set; } = null!;
         public DbSet<Flight> Flights { get; set; } = null!;
         public DbSet<Landing> Landings { get; set; } = null!;
         public DbSet<Ticket> Tickets { get; set; } = null!;
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
-
             modelBuilder.Entity<Aircraft>().ToTable("Aircraft");
             modelBuilder.Entity<Flight>().ToTable("Flight");
             modelBuilder.Entity<Landing>().ToTable("Landing");
             modelBuilder.Entity<Ticket>().ToTable("Ticket");
-
             modelBuilder.Entity<Flight>()
                 .HasOne(f => f.Aircraft)
                 .WithMany(a => a.Flights)
                 .HasForeignKey(f => f.AircraftId)
                 .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Landing>()
                 .HasOne(l => l.Flight)
                 .WithMany(f => f.Landings)
                 .HasForeignKey(l => l.FlightId)
                 .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Ticket>()
                 .HasOne(t => t.Flight)
                 .WithMany(f => f.Tickets)
@@ -46,3 +38,4 @@ namespace Airport.Data
         }
     }
 } 
+

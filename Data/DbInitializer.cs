@@ -1,7 +1,6 @@
 using Airport.Models;
 using System.Security.Cryptography;
 using System.Text;
-
 namespace Airport.Data
 {
     public static class DbInitializer
@@ -12,3 +11,4 @@ namespace Airport.Data
         }
     }
 } 
+
