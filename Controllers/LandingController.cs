@@ -1,20 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
-
+using Airport.Services;
 namespace Airport.Controllers
 {
-    public class LandingController : Controller
+    [Authorize(Roles = "Admin")]
+    public class LandingController : BaseController
     {
         private readonly ApplicationDbContext _context;
-
-        public LandingController(ApplicationDbContext context)
+        public LandingController(ApplicationDbContext context, NotificationService notificationService)
+            : base(notificationService)
         {
             _context = context;
         }
-
         public async Task<IActionResult> Index(int? flightId)
         {
             if (flightId.HasValue)
@@ -22,20 +23,16 @@ namespace Airport.Controllers
                 var flight = await _context.Flights
                     .Include(f => f.Aircraft)
                     .FirstOrDefaultAsync(f => f.Id == flightId);
-                
                 if (flight == null)
                 {
                     return NotFound();
                 }
-                
                 ViewBag.FlightInfo = $"Рейс {flight.FlightNumber} ({flight.Aircraft.Name})";
                 ViewBag.FlightId = flightId;
-                
                 var landings = await _context.Landings
                     .Where(l => l.FlightId == flightId)
                     .OrderBy(l => l.Time)
                     .ToListAsync();
-                
                 return View(landings);
             }
             else
@@ -45,11 +42,9 @@ namespace Airport.Controllers
                     .OrderBy(l => l.Flight.FlightNumber)
                     .ThenBy(l => l.Time)
                     .ToListAsync();
-                
                 return View(landings);
             }
         }
-
         public IActionResult Create(int? flightId)
         {
             if (flightId.HasValue)
@@ -63,7 +58,6 @@ namespace Airport.Controllers
                 return View();
             }
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Location,Time,FlightId")] Landing landing)
@@ -77,14 +71,12 @@ namespace Airport.Controllers
             ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
             return View(landing);
         }
-
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
             var landing = await _context.Landings.FindAsync(id);
             if (landing == null)
             {
@@ -93,7 +85,6 @@ namespace Airport.Controllers
             ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
             return View(landing);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Location,Time,FlightId")] Landing landing)
@@ -102,7 +93,6 @@ namespace Airport.Controllers
             {
                 return NotFound();
             }
-
             if (ModelState.IsValid)
             {
                 try
@@ -126,14 +116,12 @@ namespace Airport.Controllers
             ViewBag.FlightId = new SelectList(_context.Flights, "Id", "FlightNumber", landing.FlightId);
             return View(landing);
         }
-
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
             var landing = await _context.Landings
                 .Include(l => l.Flight)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -141,25 +129,22 @@ namespace Airport.Controllers
             {
                 return NotFound();
             }
-
             if (Request.Method == "POST")
             {
                 _context.Landings.Remove(landing);
                 await _context.SaveChangesAsync();
-                
                 if (Request.Query.ContainsKey("flightId"))
                 {
                     return RedirectToAction(nameof(Index), new { flightId = Request.Query["flightId"] });
                 }
                 return RedirectToAction(nameof(Index));
             }
-
             return View(landing);
         }
-
         private bool LandingExists(int id)
         {
             return _context.Landings.Any(e => e.Id == id);
         }
     }
 } 
+

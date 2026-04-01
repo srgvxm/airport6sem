@@ -4,7 +4,6 @@ using System.Diagnostics;
 using Airport.Models;
 using Airport.Data;
 using Microsoft.EntityFrameworkCore;
-
 namespace Airport.Controllers
 {
     [Authorize]
@@ -12,53 +11,49 @@ namespace Airport.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<HomeController> _logger;
-
         public HomeController(ApplicationDbContext context, ILogger<HomeController> logger)
         {
             _context = context;
             _logger = logger;
         }
-
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View();
         }
-
+        [AllowAnonymous]
         public IActionResult Privacy()
         {
             return View();
         }
-
+        [AllowAnonymous]
         public async Task<IActionResult> SearchFlights(string destination, DateTime? departureDate)
         {
             if (!departureDate.HasValue)
             {
                 departureDate = DateTime.Today;
             }
-
             var flights = await _context.Flights
                 .Include(f => f.Aircraft)
                 .Include(f => f.Landings)
                 .Where(f => f.AvailableSeats > 0 && 
                             f.DepartureTime >= departureDate.Value &&
-                            (f.Landings.Any(l => l.Location.Contains(destination)) || 
+                            (string.IsNullOrEmpty(destination) || 
+                             f.Landings.Any(l => l.Location.Contains(destination)) || 
                              f.FlightNumber.Contains(destination)))
                 .OrderBy(f => f.DepartureTime)
                 .ToListAsync();
-
             ViewBag.Destination = destination;
             ViewBag.DepartureDate = departureDate.Value.ToString("yyyy-MM-dd");
-            
             return View(flights);
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> TicketSalesReport(DateTime startDate, DateTime endDate)
         {
             if (endDate < startDate)
             {
                 endDate = startDate.AddMonths(1);
             }
-
             var tickets = await _context.Tickets
                 .Include(t => t.Flight)
                 .Include(t => t.Flight.Aircraft)
@@ -66,15 +61,13 @@ namespace Airport.Controllers
                 .OrderBy(t => t.Date)
                 .ThenBy(t => t.Time)
                 .ToListAsync();
-
             ViewBag.StartDate = startDate.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endDate.ToString("yyyy-MM-dd");
             ViewBag.TotalSales = tickets.Sum(t => t.Flight.Price);
             ViewBag.TicketCount = tickets.Count;
-
             return View(tickets);
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> FlightLoadReport()
         {
             var flights = await _context.Flights
@@ -82,25 +75,27 @@ namespace Airport.Controllers
                 .Where(f => f.DepartureTime >= DateTime.Today)
                 .OrderBy(f => f.DepartureTime)
                 .ToListAsync();
-
             foreach (var flight in flights)
             {
                 flight.LoadPercentage = 100 - (flight.AvailableSeats * 100 / flight.Aircraft.SeatCount);
             }
-
             return View(flights);
         }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
-
     public class ErrorViewModel
     {
         public string? RequestId { get; set; }
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }
 } 
+
