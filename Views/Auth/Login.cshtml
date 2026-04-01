@@ -1,10 +1,8 @@
 @model Airport.ViewModels.LoginViewModel
-
 @{
     ViewData["Title"] = "Вход";
     Layout = "_AuthLayout";
 }
-
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-left">
@@ -17,29 +15,26 @@
             </div>
         </div>
         <div class="auth-right">
-            <h2 class="auth-title">BOOKING</h2>
+            <h2 class="auth-title">ВХОД В СИСТЕМУ</h2>
             <form asp-action="Login" method="post" class="auth-form">
                 <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
-                
                 <div class="auth-form-group">
-                    <label asp-for="Email">EMAIL</label>
+                    <label asp-for="Email">ЭЛЕКТРОННАЯ ПОЧТА</label>
                     <input asp-for="Email" type="email" placeholder="example@mail.com" />
                     <span asp-validation-for="Email" class="field-validation-error"></span>
                 </div>
-
                 <div class="auth-form-group">
-                    <label asp-for="Password">PASSWORD</label>
+                    <label asp-for="Password">ПАРОЛЬ</label>
                     <input asp-for="Password" type="password" placeholder="********" />
                     <span asp-validation-for="Password" class="field-validation-error"></span>
                 </div>
-
-                <button type="submit" class="auth-submit-btn">SIGN IN</button>
-                <p class="auth-text">Dont have an account? <a asp-action="Register">Sign Up</a></p>
+                <button type="submit" class="auth-submit-btn">ВОЙТИ</button>
+                <p class="auth-text">Нет аккаунта? <a asp-action="Register">Зарегистрироваться</a></p>
             </form>
         </div>
     </div>
 </div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 } 
+

@@ -1,82 +1,171 @@
 @{
     ViewData["Title"] = "Главная";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Добро пожаловать</h1>
-    <p>Система управления авиаперевозками</p>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Поиск ближайшего рейса</h5>
-            </div>
-            <div class="card-body">
-                <form asp-controller="Home" asp-action="SearchFlights" method="get">
-                    <div class="form-group mb-3">
-                        <label for="destination">Пункт назначения</label>
-                        <input type="text" id="destination" name="destination" class="form-control" required />
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="departureDate">Дата вылета</label>
-                        <input type="date" id="departureDate" name="departureDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Найти рейсы</button>
-                </form>
+@section Styles {
+    <link rel="stylesheet" href="~/css/common.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/modern.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+            color: white;
+            padding: 5rem 0;
+            margin-bottom: 3rem;
+            border-radius: 8px;
+        }
+        .hero-section h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        .hero-section p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .search-section {
+            margin: -6rem auto 3rem;
+            position: relative;
+            z-index: 10;
+        }
+        .search-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+        }
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-align: center;
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            border-radius: 50%;
+            background-color: rgba(0, 168, 255, 0.1);
+            margin: 0 auto 1.5rem;
+        }
+    </style>
+}
+<section class="hero-section mt-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mx-auto text-center">
+                <h1 class="display-4 text-white fw-bold mb-3">Добро пожаловать в систему управления аэропортом</h1>
+                <p class="lead text-white mb-5">Удобная система для поиска и бронирования рейсов</p>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>Отчеты</h5>
+</section>
+<section class="search-section">
+    <div class="container">
+        <div class="search-container">
+            <form asp-controller="Home" asp-action="SearchFlights" method="get" class="row g-3">
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="departure" name="departure" placeholder="Откуда">
+                        <label for="departure">Откуда</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="destination" name="destination" placeholder="Куда">
+                        <label for="destination">Куда</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="date" name="date" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                        <label for="date">Дата вылета</label>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary search-btn h-100 w-100">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    <div class="container mt-4">
+        <div class="alert alert-primary">
+            <i class="fas fa-info-circle me-2"></i> Вы вошли как администратор. Вы можете управлять системой через верхнее меню.
+        </div>
+    </div>
+}
+<section class="features-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="card-title">Поиск билетов</h3>
+                        <p class="card-text">Найдите подходящий рейс и забронируйте билет</p>
+                        <a asp-controller="Home" asp-action="SearchFlights" class="btn btn-primary mt-3">Найти билеты</a>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a asp-controller="Home" asp-action="TicketSalesReport" 
-                       asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" 
-                       asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")" 
-                       class="btn btn-outline-primary">
-                        Отчет о продаже билетов
-                    </a>
-                    <a asp-controller="Home" asp-action="FlightLoadReport" class="btn btn-outline-primary">
-                        Отчет о загруженности рейсов
-                    </a>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <h3 class="card-title">Мои билеты</h3>
+                        <p class="card-text">Просмотр истории заказов и управление билетами</p>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-controller="Ticket" asp-action="Index" class="btn btn-primary mt-3">Мои билеты</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Auth" asp-action="Login" class="btn btn-primary mt-3">Войти</a>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
+                    <div class="card-body text-center">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-user">
+                            </i>
+                        </div>
+                        <h3 class="card-title">Мой профиль</h3>
+                        <p class="card-text">Управление личными данными и настройками</p>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <a asp-controller="Auth" asp-action="Profile" class="btn btn-primary mt-3">Профиль</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Auth" asp-action="Login" class="btn btn-primary mt-3">Войти</a>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Самолеты</h5>
-                <p class="card-text">Управление данными о самолетах.</p>
-                <a asp-controller="Aircraft" asp-action="Index" class="btn btn-primary">Перейти</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Рейсы</h5>
-                <p class="card-text">Управление рейсами и расписанием.</p>
-                <a asp-controller="Flight" asp-action="Index" class="btn btn-primary">Перейти</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Билеты</h5>
-                <p class="card-text">Продажа и управление билетами.</p>
-                <a asp-controller="Ticket" asp-action="Index" class="btn btn-primary">Перейти</a>
-            </div>
-        </div>
-    </div>
-</div> 

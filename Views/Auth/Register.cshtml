@@ -1,10 +1,8 @@
 @model Airport.ViewModels.RegisterViewModel
-
 @{
     ViewData["Title"] = "Регистрация";
     Layout = "_AuthLayout";
 }
-
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-left">
@@ -17,41 +15,36 @@
             </div>
         </div>
         <div class="auth-right">
-            <h2 class="auth-title">CREATE ACCOUNT</h2>
+            <h2 class="auth-title">РЕГИСТРАЦИЯ</h2>
             <form asp-action="Register" method="post" class="auth-form">
                 <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
-                
                 <div class="auth-form-group">
-                    <label asp-for="Username">USER NAME</label>
+                    <label asp-for="Username">ИМЯ ПОЛЬЗОВАТЕЛЯ</label>
                     <input asp-for="Username" type="text" placeholder="Ваше имя" />
                     <span asp-validation-for="Username" class="field-validation-error"></span>
                 </div>
-
                 <div class="auth-form-group">
-                    <label asp-for="Email">EMAIL</label>
+                    <label asp-for="Email">ЭЛЕКТРОННАЯ ПОЧТА</label>
                     <input asp-for="Email" type="email" placeholder="example@mail.com" />
                     <span asp-validation-for="Email" class="field-validation-error"></span>
                 </div>
-
                 <div class="auth-form-group">
-                    <label asp-for="Password">PASSWORD</label>
+                    <label asp-for="Password">ПАРОЛЬ</label>
                     <input asp-for="Password" type="password" placeholder="********" />
                     <span asp-validation-for="Password" class="field-validation-error"></span>
                 </div>
-
                 <div class="auth-form-group">
-                    <label asp-for="ConfirmPassword">CONFIRM PASSWORD</label>
+                    <label asp-for="ConfirmPassword">ПОДТВЕРЖДЕНИЕ ПАРОЛЯ</label>
                     <input asp-for="ConfirmPassword" type="password" placeholder="********" />
                     <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
                 </div>
-
-                <button type="submit" class="auth-submit-btn">SIGN UP</button>
-                <p class="auth-text">Already have an account? <a asp-action="Login">Sign In</a></p>
+                <button type="submit" class="auth-submit-btn">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+                <p class="auth-text">Уже есть аккаунт? <a asp-action="Login">Войти</a></p>
             </form>
         </div>
     </div>
 </div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 } 
+
