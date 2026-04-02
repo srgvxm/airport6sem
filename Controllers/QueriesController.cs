@@ -1,21 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
 using Airport.ViewModels;
-
+using Airport.Services;
 namespace Airport.Controllers
 {
-    public class QueriesController : Controller
+    [Authorize(Roles = "Admin")]
+    public class QueriesController : BaseController
     {
         private readonly ApplicationDbContext _context;
-
-        public QueriesController(ApplicationDbContext context)
+        public QueriesController(ApplicationDbContext context, NotificationService notificationService)
+            : base(notificationService)
         {
             _context = context;
         }
-
         public async Task<IActionResult> AvailableSeats(int? flightId)
         {
             var flights = await _context.Flights
@@ -25,15 +26,12 @@ namespace Airport.Controllers
                     DisplayText = $"{f.FlightNumber} - {f.DepartureTime} ({f.AvailableSeats} мест)"
                 })
                 .ToListAsync();
-
             ViewData["FlightId"] = new SelectList(flights, "Id", "DisplayText", flightId);
-
             if (flightId.HasValue)
             {
                 var flight = await _context.Flights
                     .Include(f => f.Aircraft)
                     .FirstOrDefaultAsync(f => f.Id == flightId);
-
                 if (flight != null)
                 {
                     ViewData["AvailableSeats"] = flight.AvailableSeats;
@@ -41,10 +39,8 @@ namespace Airport.Controllers
                     ViewData["FlightNumber"] = flight.FlightNumber;
                 }
             }
-
             return View();
         }
-
         public async Task<IActionResult> DirectFlights()
         {
             var directFlights = await _context.Flights
@@ -60,10 +56,8 @@ namespace Airport.Controllers
                     TotalSeats = f.Aircraft.SeatCount
                 })
                 .ToListAsync();
-
             return View(directFlights);
         }
-
         public async Task<IActionResult> FlightsByAircraft(int? aircraftId)
         {
             var aircraft = await _context.Aircrafts
@@ -73,9 +67,7 @@ namespace Airport.Controllers
                     DisplayText = $"{a.Name} ({a.Category})"
                 })
                 .ToListAsync();
-
             ViewData["AircraftId"] = new SelectList(aircraft, "Id", "DisplayText", aircraftId);
-
             if (aircraftId.HasValue)
             {
                 var flights = await _context.Flights
@@ -91,20 +83,16 @@ namespace Airport.Controllers
                         TotalSeats = f.Aircraft.SeatCount
                     })
                     .ToListAsync();
-
                 return View(flights);
             }
-
             return View(Enumerable.Empty<FlightSummaryViewModel>());
         }
-
         public async Task<IActionResult> AircraftLoadByDate(DateTime? date)
         {
             if (!date.HasValue)
             {
                 date = DateTime.Today;
             }
-
             var flightLoads = await _context.Flights
                 .Include(f => f.Aircraft)
                 .Where(f => f.DepartureTime.Date == date.Value.Date)
@@ -118,11 +106,9 @@ namespace Airport.Controllers
                     LoadPercentage = ((double)(f.Aircraft.SeatCount - f.AvailableSeats) / f.Aircraft.SeatCount) * 100
                 })
                 .ToListAsync();
-
             ViewData["SelectedDate"] = date.Value.ToString("yyyy-MM-dd");
             return View(flightLoads);
         }
-
         public async Task<IActionResult> MostExpensiveFlights()
         {
             var flights = await _context.Flights
@@ -139,10 +125,8 @@ namespace Airport.Controllers
                 .OrderByDescending(f => f.TotalRevenue)
                 .Take(5)
                 .ToListAsync();
-
             return View(flights);
         }
-
         public async Task<IActionResult> UnderutilizedFlights(int minEmptySeats = 10)
         {
             var flights = await _context.Flights
@@ -159,9 +143,9 @@ namespace Airport.Controllers
                 })
                 .OrderByDescending(f => f.EmptyPercentage)
                 .ToListAsync();
-
             ViewData["MinEmptySeats"] = minEmptySeats;
             return View(flights);
         }
     }
 } 
+

@@ -1,20 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
 using Airport.ViewModels;
-
+using Airport.Services;
 namespace Airport.Controllers
 {
-    public class SummaryController : Controller
+    [Authorize(Roles = "Admin")]
+    public class SummaryController : BaseController
     {
         private readonly ApplicationDbContext _context;
-
-        public SummaryController(ApplicationDbContext context)
+        public SummaryController(ApplicationDbContext context, NotificationService notificationService)
+            : base(notificationService)
         {
             _context = context;
         }
-
         public async Task<IActionResult> Aircraft()
         {
             var aircraftSummaries = await _context.Aircrafts
@@ -27,10 +28,8 @@ namespace Airport.Controllers
                     FlightsCount = a.Flights.Count
                 })
                 .ToListAsync();
-
             return View(aircraftSummaries);
         }
-
         public async Task<IActionResult> Flights()
         {
             var flightSummaries = await _context.Flights
@@ -51,10 +50,8 @@ namespace Airport.Controllers
                     }).ToList()
                 })
                 .ToListAsync();
-
             return View(flightSummaries);
         }
-
         public async Task<IActionResult> Tickets()
         {
             var ticketSummaries = await _context.Tickets
@@ -71,8 +68,8 @@ namespace Airport.Controllers
                     DepartureTime = t.Flight.DepartureTime
                 })
                 .ToListAsync();
-
             return View(ticketSummaries);
         }
     }
 } 
+
