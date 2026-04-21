@@ -97,6 +97,9 @@ namespace Airport.Controllers
                     DisplayText = $"{f.FlightNumber} - {f.DepartureTime} ({f.AvailableSeats} мест)"
                 });
             ViewData["FlightId"] = new SelectList(availableFlights, "Id", "DisplayText", flightId);
+            ViewBag.FlightPrices = System.Text.Json.JsonSerializer.Serialize(
+                _context.Flights.Where(f => f.AvailableSeats > 0)
+                    .Select(f => new { f.Id, f.Price }).ToList());
             var ticket = new Ticket 
             { 
                 Date = DateTime.Today,
@@ -112,7 +115,7 @@ namespace Airport.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CashboxNumber,FlightId,Date,Time,PassengerName,PassportSeries,PassportNumber,ContactPhone,ContactEmail,SeatNumber")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,CashboxNumber,FlightId,Date,Time,PassengerName,PassportSeries,PassportNumber,ContactPhone,ContactEmail,SeatNumber,HasBaggage,HasMeal,HasInsurance")] Ticket ticket)
         {
             if (User.IsInRole("Admin"))
             {
@@ -177,6 +180,9 @@ namespace Airport.Controllers
                     DisplayText = $"{f.FlightNumber} - {f.DepartureTime} ({f.AvailableSeats} мест)"
                 });
             ViewData["FlightId"] = new SelectList(availableFlights, "Id", "DisplayText", ticket.FlightId);
+            ViewBag.FlightPrices = System.Text.Json.JsonSerializer.Serialize(
+                _context.Flights.Where(f => f.AvailableSeats > 0)
+                    .Select(f => new { f.Id, f.Price }).ToList());
             return View(ticket);
         }
         [Authorize(Roles = "Admin")]
@@ -198,12 +204,14 @@ namespace Airport.Controllers
                 DisplayText = $"{f.FlightNumber} - {f.DepartureTime} ({f.AvailableSeats} мест)"
             });
             ViewData["FlightId"] = new SelectList(flights, "Id", "DisplayText", ticket.FlightId);
+            ViewBag.FlightPrices = System.Text.Json.JsonSerializer.Serialize(
+                _context.Flights.Select(f => new { f.Id, f.Price }).ToList());
             return View(ticket);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CashboxNumber,FlightId,Date,Time,PassengerName,PassportSeries,PassportNumber,ContactPhone,ContactEmail,SeatNumber")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CashboxNumber,FlightId,Date,Time,PassengerName,PassportSeries,PassportNumber,ContactPhone,ContactEmail,SeatNumber,HasBaggage,HasMeal,HasInsurance")] Ticket ticket)
         {
             ViewData["IsAdminLayout"] = true;
             if (id != ticket.Id)
@@ -276,6 +284,8 @@ namespace Airport.Controllers
                 DisplayText = $"{f.FlightNumber} - {f.DepartureTime} ({f.AvailableSeats} мест)"
             });
             ViewData["FlightId"] = new SelectList(availableFlights, "Id", "DisplayText", ticket.FlightId);
+            ViewBag.FlightPrices = System.Text.Json.JsonSerializer.Serialize(
+                _context.Flights.Select(f => new { f.Id, f.Price }).ToList());
             return View(ticket);
         }
         [Authorize(Roles = "Admin")]
