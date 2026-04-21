@@ -39,6 +39,14 @@ namespace Airport.Models
         public int FlightId { get; set; }
         [ValidateNever]
         public Flight Flight { get; set; } = null!;
+
+        public bool HasBaggage { get; set; }
+        public bool HasMeal { get; set; }
+        public bool HasInsurance { get; set; }
+
+        [NotMapped] public static decimal BaggagePrice  => 1500m;
+        [NotMapped] public static decimal MealPrice     => 500m;
+        [NotMapped] public static decimal InsurancePrice => 800m;
     }
 } 
 
