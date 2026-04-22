@@ -1,37 +1,140 @@
 @model Ticket
-
 @{
     ViewData["Title"] = "Редактирование билета";
 }
 
 <h1>Редактирование билета</h1>
-
 <hr />
+
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-7">
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+
             <div class="form-group mb-3">
                 <label asp-for="CashboxNumber" class="control-label">№ кассы</label>
                 <input asp-for="CashboxNumber" class="form-control" />
                 <span asp-validation-for="CashboxNumber" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="FlightId" class="control-label">Рейс</label>
-                <select asp-for="FlightId" class="form-control" asp-items="ViewBag.FlightId"></select>
+                <select asp-for="FlightId" class="form-control" asp-items="ViewBag.FlightId" id="flightSelect"></select>
                 <span asp-validation-for="FlightId" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="Date" class="control-label">Дата</label>
                 <input asp-for="Date" class="form-control" type="date" />
-                <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Time" class="control-label">Время</label>
                 <input asp-for="Time" class="form-control" type="time" />
-                <span asp-validation-for="Time" class="text-danger"></span>
             </div>
+
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Данные пассажира</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label asp-for="PassengerName" class="control-label">ФИО пассажира</label>
+                        <input asp-for="PassengerName" class="form-control" />
+                        <span asp-validation-for="PassengerName" class="text-danger"></span>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="PassportSeries" class="control-label">Серия</label>
+                                <input asp-for="PassportSeries" class="form-control" maxlength="4" />
+                                <span asp-validation-for="PassportSeries" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label asp-for="PassportNumber" class="control-label">Номер</label>
+                                <input asp-for="PassportNumber" class="form-control" maxlength="6" />
+                                <span asp-validation-for="PassportNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="ContactPhone" class="control-label">Телефон (+7...)</label>
+                        <input asp-for="ContactPhone" class="form-control" placeholder="+71234567890" maxlength="12" />
+                        <span asp-validation-for="ContactPhone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="ContactEmail" class="control-label">Email</label>
+                        <input asp-for="ContactEmail" class="form-control" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="SeatNumber" class="control-label">Место</label>
+                        <input asp-for="SeatNumber" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            @* Дополнительные услуги *@
+            <div class="card mb-3 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-concierge-bell me-2"></i>Дополнительные услуги</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="service-card @(Model.HasBaggage ? "selected" : "")" id="label-baggage">
+                                <input type="checkbox" asp-for="HasBaggage" class="d-none"
+                                       onchange="updateTotal()" />
+                                <div class="service-icon"><i class="fas fa-suitcase-rolling"></i></div>
+                                <div class="service-name">Багаж</div>
+                                <div class="service-price">+@Ticket.BaggagePrice.ToString("N0") ₽</div>
+                                <div class="service-desc">до 23 кг</div>
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="service-card @(Model.HasMeal ? "selected" : "")" id="label-meal">
+                                <input type="checkbox" asp-for="HasMeal" class="d-none"
+                                       onchange="updateTotal()" />
+                                <div class="service-icon"><i class="fas fa-utensils"></i></div>
+                                <div class="service-name">Питание</div>
+                                <div class="service-price">+@Ticket.MealPrice.ToString("N0") ₽</div>
+                                <div class="service-desc">горячее на борту</div>
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="service-card @(Model.HasInsurance ? "selected" : "")" id="label-insurance">
+                                <input type="checkbox" asp-for="HasInsurance" class="d-none"
+                                       onchange="updateTotal()" />
+                                <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                                <div class="service-name">Страховка</div>
+                                <div class="service-price">+@Ticket.InsurancePrice.ToString("N0") ₽</div>
+                                <div class="service-desc">медицинская</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Итог *@
+            <div class="card mb-3 bg-light">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Стоимость билета:</span>
+                        <span id="flightPrice">—</span>
+                    </div>
+                    <div class="d-flex justify-content-between" id="extraRow" style="display:none!important">
+                        <span class="text-muted">Доп. услуги:</span>
+                        <span id="extraPrice" class="text-success">0 ₽</span>
+                    </div>
+                    <hr class="my-2" />
+                    <div class="d-flex justify-content-between">
+                        <strong>Итого:</strong>
+                        <strong id="totalPrice" class="fs-5">—</strong>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Сохранить" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
@@ -40,6 +143,62 @@
     </div>
 </div>
 
+<style>
+    .service-card {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 16px 10px; border: 2px solid #dee2e6; border-radius: 10px;
+        cursor: pointer; transition: all 0.2s; background: #fff;
+        text-align: center; user-select: none; width: 100%; margin: 0;
+    }
+    .service-card:hover { border-color: #3498db; background: #f0f8ff; }
+    .service-card.selected { border-color: #3498db; background: #e8f4fd; }
+    .service-icon { font-size: 2rem; color: #3498db; margin-bottom: 8px; }
+    .service-name { font-weight: 600; font-size: 0.95rem; }
+    .service-price { color: #27ae60; font-weight: 700; font-size: 1rem; }
+    .service-desc { color: #999; font-size: 0.8rem; }
+</style>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-} 
+    <script>
+        var flightPrices   = @Html.Raw(ViewBag.FlightPrices ?? "[]");
+        var baggagePrice   = @Ticket.BaggagePrice;
+        var mealPrice      = @Ticket.MealPrice;
+        var insurancePrice = @Ticket.InsurancePrice;
+
+        function getFlightPrice() {
+            var id = parseInt(document.getElementById('flightSelect').value);
+            var match = flightPrices.find(function(f) { return f.id === id || f.Id === id; });
+            return match ? (match.price || match.Price || 0) : null;
+        }
+
+        function updateTotal() {
+            var base  = getFlightPrice();
+            var extra = 0;
+            if (document.getElementById('HasBaggage').checked)   extra += baggagePrice;
+            if (document.getElementById('HasMeal').checked)      extra += mealPrice;
+            if (document.getElementById('HasInsurance').checked) extra += insurancePrice;
+
+            if (base !== null) {
+                document.getElementById('flightPrice').textContent = fmt(base) + ' ₽';
+                document.getElementById('extraPrice').textContent  = fmt(extra) + ' ₽';
+                document.getElementById('totalPrice').textContent  = fmt(base + extra) + ' ₽';
+                document.getElementById('extraRow').style.display  = extra > 0 ? '' : 'none';
+            }
+
+            card('label-baggage',   document.getElementById('HasBaggage').checked);
+            card('label-meal',      document.getElementById('HasMeal').checked);
+            card('label-insurance', document.getElementById('HasInsurance').checked);
+        }
+
+        function card(id, on) {
+            var el = document.getElementById(id);
+            if (on) el.classList.add('selected'); else el.classList.remove('selected');
+        }
+
+        function fmt(n) { return n.toLocaleString('ru-RU'); }
+
+        document.getElementById('flightSelect').addEventListener('change', updateTotal);
+        document.addEventListener('DOMContentLoaded', updateTotal);
+    </script>
+}

@@ -1,59 +1,110 @@
 @model Ticket
-
 @{
-    ViewData["Title"] = "Детали билета";
+    ViewData["Title"] = User.IsInRole("Admin") ? "Детали билета" : "Мой билет";
+    var extraTotal = (Model.HasBaggage ? Ticket.BaggagePrice : 0)
+                   + (Model.HasMeal    ? Ticket.MealPrice    : 0)
+                   + (Model.HasInsurance ? Ticket.InsurancePrice : 0);
+    var totalPrice = Model.Flight.Price + extraTotal;
 }
 
-<h1>Детали билета</h1>
-
+<h1>@ViewData["Title"]</h1>
 <div>
     <hr />
     <dl class="row">
-        <dt class="col-sm-3">
-            № кассы
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.CashboxNumber)
-        </dd>
-        <dt class="col-sm-3">
-            № рейса
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Flight.FlightNumber)
-        </dd>
-        <dt class="col-sm-3">
-            Время вылета рейса
-        </dt>
-        <dd class="col-sm-9">
-            @Model.Flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")
-        </dd>
-        <dt class="col-sm-3">
-            Самолет
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Flight.Aircraft.Name)
-        </dd>
-        <dt class="col-sm-3">
-            Дата продажи
-        </dt>
-        <dd class="col-sm-9">
-            @Model.Date.ToString("dd.MM.yyyy")
-        </dd>
-        <dt class="col-sm-3">
-            Время продажи
-        </dt>
-        <dd class="col-sm-9">
-            @Model.Time.ToString(@"hh\:mm")
-        </dd>
-        <dt class="col-sm-3">
-            Цена билета
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Flight.Price)
-        </dd>
+        <dt class="col-sm-3">Номер билета</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.TicketNumber)</dd>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <dt class="col-sm-3">№ кассы</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.CashboxNumber)</dd>
+        }
+
+        <dt class="col-sm-3">№ рейса</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.Flight.FlightNumber)</dd>
+
+        <dt class="col-sm-3">Время вылета</dt>
+        <dd class="col-sm-9">@Model.Flight.DepartureTime.ToString("dd.MM.yyyy HH:mm")</dd>
+
+        <dt class="col-sm-3">Место</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.SeatNumber)</dd>
+
+        <dt class="col-sm-3">Пассажир</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.PassengerName)</dd>
+
+        <dt class="col-sm-3">Паспорт</dt>
+        <dd class="col-sm-9">Серия: @Model.PassportSeries, Номер: @Model.PassportNumber</dd>
+
+        <dt class="col-sm-3">Телефон</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.ContactPhone)</dd>
+
+        <dt class="col-sm-3">Самолет</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.Flight.Aircraft.Name)</dd>
+
+        <dt class="col-sm-3">Дата продажи</dt>
+        <dd class="col-sm-9">@Model.Date.ToString("dd.MM.yyyy")</dd>
+
+        <dt class="col-sm-3">Время продажи</dt>
+        <dd class="col-sm-9">@Model.Time.ToString(@"hh\:mm")</dd>
     </dl>
+
+    <hr />
+    <h5 class="mb-3"><i class="fas fa-concierge-bell me-2 text-primary"></i>Дополнительные услуги</h5>
+
+    @if (!Model.HasBaggage && !Model.HasMeal && !Model.HasInsurance)
+    {
+        <p class="text-muted">Дополнительные услуги не выбраны.</p>
+    }
+    else
+    {
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            @if (Model.HasBaggage)
+            {
+                <span class="badge rounded-pill bg-primary fs-6 px-3 py-2">
+                    <i class="fas fa-suitcase-rolling me-1"></i> Багаж — @Ticket.BaggagePrice.ToString("N0") ₽
+                </span>
+            }
+            @if (Model.HasMeal)
+            {
+                <span class="badge rounded-pill bg-success fs-6 px-3 py-2">
+                    <i class="fas fa-utensils me-1"></i> Питание — @Ticket.MealPrice.ToString("N0") ₽
+                </span>
+            }
+            @if (Model.HasInsurance)
+            {
+                <span class="badge rounded-pill bg-warning text-dark fs-6 px-3 py-2">
+                    <i class="fas fa-shield-alt me-1"></i> Страховка — @Ticket.InsurancePrice.ToString("N0") ₽
+                </span>
+            }
+        </div>
+    }
+
+    <div class="card bg-light" style="max-width: 320px;">
+        <div class="card-body py-2">
+            <div class="d-flex justify-content-between">
+                <span class="text-muted">Стоимость билета:</span>
+                <span>@Model.Flight.Price.ToString("N0") ₽</span>
+            </div>
+            @if (extraTotal > 0)
+            {
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Доп. услуги:</span>
+                    <span class="text-success">+@extraTotal.ToString("N0") ₽</span>
+                </div>
+            }
+            <hr class="my-2" />
+            <div class="d-flex justify-content-between">
+                <strong>Итого:</strong>
+                <strong class="text-primary fs-5">@totalPrice.ToString("N0") ₽</strong>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
+
+<div class="mt-3">
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
+    }
     <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
-</div> 
+</div>

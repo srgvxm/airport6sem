@@ -1,11 +1,8 @@
 @model Ticket
-
 @{
     ViewData["Title"] = "Удаление билета";
 }
-
 <h1>Удаление билета</h1>
-
 <h3>Вы уверены, что хотите удалить этот билет?</h3>
 <div>
     <hr />
@@ -35,10 +32,10 @@
             @Model.Time.ToString("HH:mm")
         </dd>
     </dl>
-    
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Удалить" class="btn btn-danger" />
         <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
     </form>
 </div> 
+

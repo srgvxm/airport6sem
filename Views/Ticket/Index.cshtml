@@ -1,20 +1,30 @@
 @model IEnumerable<Ticket>
-
 @{
-    ViewData["Title"] = "Билеты";
+    ViewData["Title"] = User.IsInRole("Admin") ? "Все билеты" : "Мои билеты";
 }
-
-<h1>Билеты</h1>
-
+<h1>@ViewData["Title"]</h1>
 <p>
-    <a asp-action="Create" class="btn btn-primary">Продать билет</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-primary">Продать билет</a>
+    }
+    else
+    {
+        <a asp-controller="Home" asp-action="SearchFlights" class="btn btn-primary">Купить новый билет</a>
+    }
 </p>
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>
-                № кассы
+                Номер билета
             </th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>
+                    № кассы
+                </th>
+            }
             <th>
                 № рейса
             </th>
@@ -24,15 +34,27 @@
             <th>
                 Время
             </th>
-            <th>Действия</th>
+            <th>
+                Место
+            </th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>Действия</th>
+            }
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.CashboxNumber)
+                @Html.DisplayFor(modelItem => item.TicketNumber)
             </td>
+            @if (User.IsInRole("Admin"))
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.CashboxNumber)
+                </td>
+            }
             <td>
                 @Html.DisplayFor(modelItem => item.Flight.FlightNumber)
             </td>
@@ -43,11 +65,18 @@
                 @item.Time.ToString(@"hh\:mm")
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
-                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Ticket", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
+                @Html.DisplayFor(modelItem => item.SeatNumber)
             </td>
+            @if (User.IsInRole("Admin"))
+            {
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
+                    <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Ticket", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
+                </td>
+            }
         </tr>
 }
     </tbody>
 </table> 
+
