@@ -70,6 +70,11 @@
             </li>
             <li class="admin-menu-group">Система</li>
             <li class="admin-menu-item">
+                <a asp-controller="Admin" asp-action="AuditLogs" class="admin-menu-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "AuditLogs" || ViewContext.RouteData.Values["Action"]?.ToString() == "AuditLogDetails" ? "active" : "")">
+                    <i class="fas fa-clipboard-list"></i> Журнал действий
+                </a>
+            </li>
+            <li class="admin-menu-item">
                 <a asp-controller="Home" asp-action="Index" class="admin-menu-link">
                     <i class="fas fa-home"></i> Вернуться на сайт
                 </a>
