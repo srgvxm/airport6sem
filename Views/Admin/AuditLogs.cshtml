@@ -1,0 +1,252 @@
+@model List<Airport.Models.AuditLog>
+@{
+    ViewData["Title"] = "Журнал действий пользователей";
+    Layout = "_AdminLayout";
+
+    var currentPage   = (int)ViewBag.CurrentPage;
+    var totalPages    = (int)ViewBag.TotalPages;
+    var totalCount    = (int)ViewBag.TotalCount;
+    var stats         = (dynamic)ViewBag.Stats;
+    var allDescs      = (List<string>)ViewBag.AllDescriptions;
+    var roles         = (List<string>)ViewBag.Roles;
+    var filterDesc    = (string?)ViewBag.FilterActionDescription;
+}
+
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-clipboard-list"></i> Журнал действий</h1>
+    <span class="badge bg-secondary" style="font-size: 0.9rem;">Всего записей: @totalCount</span>
+</div>
+
+<div class="admin-stats mb-4">
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon blue">
+            <i class="fas fa-list-alt"></i>
+        </div>
+        <div class="admin-stat-info">
+            <h3 class="admin-stat-value">@stats.totalAll</h3>
+            <p class="admin-stat-label">Всего действий</p>
+        </div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon green">
+            <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="admin-stat-info">
+            <h3 class="admin-stat-value">@stats.totalToday</h3>
+            <p class="admin-stat-label">Действий сегодня</p>
+        </div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon orange">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="admin-stat-info">
+            <h3 class="admin-stat-value">@stats.uniqueUsersToday</h3>
+            <p class="admin-stat-label">Активных пользователей сегодня</p>
+        </div>
+    </div>
+</div>
+
+<div class="admin-card mb-4">
+    <div class="admin-card-header">
+        <h5 class="admin-card-title"><i class="fas fa-filter"></i> Фильтры</h5>
+        <a href="@Url.Action("AuditLogs")" class="admin-btn admin-btn-sm admin-btn-warning">
+            <i class="fas fa-times"></i> Сбросить
+        </a>
+    </div>
+    <div class="admin-card-body">
+        <form method="get" asp-action="AuditLogs">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Пользователь</label>
+                    <input type="text" name="username" class="form-control" placeholder="Имя пользователя"
+                           value="@ViewBag.FilterUsername" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Роль</label>
+                    <select name="role" class="form-select">
+                        <option value="">Все роли</option>
+                        @foreach (var r in roles)
+                        {
+                            <option value="@r" selected="@(ViewBag.FilterRole == r)">@r</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Действие</label>
+                    <select name="actionDescription" class="form-select">
+                        <option value="">Все действия</option>
+                        @foreach (var d in allDescs)
+                        {
+                            <option value="@d" selected="@(filterDesc == d)">@d</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Дата от</label>
+                    <input type="date" name="dateFrom" class="form-control" value="@ViewBag.FilterDateFrom" />
+                </div>
+            </div>
+            <div class="row g-3 mt-1">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Дата до</label>
+                    <input type="date" name="dateTo" class="form-control" value="@ViewBag.FilterDateTo" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="admin-btn admin-btn-primary w-100">
+                        <i class="fas fa-search"></i> Применить
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body p-0">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Время</th>
+                        <th>Пользователь</th>
+                        <th>Роль</th>
+                        <th>Действие</th>
+                        <th style="width: 90px;">Статус</th>
+                        <th style="width: 60px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="fas fa-inbox" style="font-size: 2rem; color: #ccc;"></i>
+                                <p class="text-muted mt-2 mb-0">Записи не найдены</p>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var log in Model)
+                    {
+                        var statusClass = log.StatusCode switch
+                        {
+                            >= 200 and < 300 => "text-success",
+                            >= 300 and < 400 => "text-info",
+                            >= 400 and < 500 => "text-warning",
+                            >= 500           => "text-danger",
+                            _                => ""
+                        };
+                        var roleBadge = log.UserRole switch
+                        {
+                            "Admin" => "bg-danger",
+                            "User"  => "bg-info",
+                            _       => "bg-secondary"
+                        };
+                        <tr>
+                            <td><small class="text-muted">@log.Id</small></td>
+                            <td>
+                                <small>@log.Timestamp.ToLocalTime().ToString("dd.MM.yyyy")</small><br />
+                                <small class="text-muted">@log.Timestamp.ToLocalTime().ToString("HH:mm:ss")</small>
+                            </td>
+                            <td>
+                                @if (log.UserId.HasValue)
+                                {
+                                    <a asp-action="UserDetails" asp-route-id="@log.UserId">@log.Username</a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">@log.Username</span>
+                                }
+                            </td>
+                            <td><span class="badge @roleBadge">@log.UserRole</span></td>
+                            <td>@log.ActionDescription</td>
+                            <td><span class="fw-bold @statusClass">@log.StatusCode</span></td>
+                            <td>
+                                <a asp-action="AuditLogDetails" asp-route-id="@log.Id"
+                                   class="admin-btn admin-btn-sm admin-btn-primary" title="Подробности">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (totalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="AuditLogs"
+                   asp-route-page="@(currentPage - 1)"
+                   asp-route-username="@ViewBag.FilterUsername"
+                   asp-route-role="@ViewBag.FilterRole"
+                   asp-route-actionDescription="@filterDesc"
+                   asp-route-dateFrom="@ViewBag.FilterDateFrom"
+                   asp-route-dateTo="@ViewBag.FilterDateTo">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            @{
+                var startPage = Math.Max(1, currentPage - 3);
+                var endPage   = Math.Min(totalPages, currentPage + 3);
+            }
+            @if (startPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="AuditLogs" asp-route-page="1"
+                       asp-route-username="@ViewBag.FilterUsername"
+                       asp-route-role="@ViewBag.FilterRole"
+                       asp-route-actionDescription="@filterDesc"
+                       asp-route-dateFrom="@ViewBag.FilterDateFrom"
+                       asp-route-dateTo="@ViewBag.FilterDateTo">1</a>
+                </li>
+                @if (startPage > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+            }
+            @for (var i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" asp-action="AuditLogs" asp-route-page="@i"
+                       asp-route-username="@ViewBag.FilterUsername"
+                       asp-route-role="@ViewBag.FilterRole"
+                       asp-route-actionDescription="@filterDesc"
+                       asp-route-dateFrom="@ViewBag.FilterDateFrom"
+                       asp-route-dateTo="@ViewBag.FilterDateTo">@i</a>
+                </li>
+            }
+            @if (endPage < totalPages)
+            {
+                @if (endPage < totalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+                <li class="page-item">
+                    <a class="page-link" asp-action="AuditLogs" asp-route-page="@totalPages"
+                       asp-route-username="@ViewBag.FilterUsername"
+                       asp-route-role="@ViewBag.FilterRole"
+                       asp-route-actionDescription="@filterDesc"
+                       asp-route-dateFrom="@ViewBag.FilterDateFrom"
+                       asp-route-dateTo="@ViewBag.FilterDateTo">@totalPages</a>
+                </li>
+            }
+            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="AuditLogs"
+                   asp-route-page="@(currentPage + 1)"
+                   asp-route-username="@ViewBag.FilterUsername"
+                   asp-route-role="@ViewBag.FilterRole"
+                   asp-route-actionDescription="@filterDesc"
+                   asp-route-dateFrom="@ViewBag.FilterDateFrom"
+                   asp-route-dateTo="@ViewBag.FilterDateTo">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}

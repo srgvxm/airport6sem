@@ -1,0 +1,90 @@
+@model Airport.Models.AuditLog
+@{
+    ViewData["Title"] = "Детали действия";
+    Layout = "_AdminLayout";
+
+    var statusClass = Model.StatusCode switch
+    {
+        >= 200 and < 300 => "text-success",
+        >= 300 and < 400 => "text-info",
+        >= 400 and < 500 => "text-warning",
+        >= 500           => "text-danger",
+        _                => ""
+    };
+    var roleBadge = Model.UserRole switch
+    {
+        "Admin" => "bg-danger",
+        "User"  => "bg-info",
+        _       => "bg-secondary"
+    };
+}
+
+<div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-clipboard-list"></i> Действие #@Model.Id</h1>
+    <a asp-action="AuditLogs" class="admin-btn admin-btn-primary">
+        <i class="fas fa-arrow-left"></i> Назад к журналу
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title"><i class="fas fa-user"></i> Пользователь</h5>
+            </div>
+            <div class="admin-card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <td class="fw-bold" style="width: 40%;">ID</td>
+                        <td>@(Model.UserId?.ToString() ?? "—")</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Имя</td>
+                        <td>
+                            @if (Model.UserId.HasValue)
+                            {
+                                <a asp-action="UserDetails" asp-route-id="@Model.UserId">@Model.Username</a>
+                            }
+                            else
+                            {
+                                @Model.Username
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Роль</td>
+                        <td><span class="badge @roleBadge">@Model.UserRole</span></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">IP-адрес</td>
+                        <td><code>@Model.IpAddress</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">
+                <h5 class="admin-card-title"><i class="fas fa-cog"></i> Событие</h5>
+            </div>
+            <div class="admin-card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <td class="fw-bold" style="width: 40%;">Время</td>
+                        <td>@Model.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss")</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Действие</td>
+                        <td><strong>@Model.ActionDescription</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Статус ответа</td>
+                        <td><span class="fw-bold @statusClass fs-5">@Model.StatusCode</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
