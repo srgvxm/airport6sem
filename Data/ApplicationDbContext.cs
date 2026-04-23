@@ -10,6 +10,7 @@ namespace Airport.Data
         public DbSet<Flight> Flights { get; set; } = null!;
         public DbSet<Landing> Landings { get; set; } = null!;
         public DbSet<Ticket> Tickets { get; set; } = null!;
+        public DbSet<AuditLog> AuditLogs { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,6 +36,11 @@ namespace Airport.Data
                 .WithMany(f => f.Tickets)
                 .HasForeignKey(t => t.FlightId)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<AuditLog>().ToTable("AuditLog");
+            modelBuilder.Entity<AuditLog>()
+                .HasIndex(a => a.Timestamp);
+            modelBuilder.Entity<AuditLog>()
+                .HasIndex(a => a.UserId);
         }
     }
 } 
