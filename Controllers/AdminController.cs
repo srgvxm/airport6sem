@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
+using Airport.Services;
 using System.Linq;
 using System.Threading.Tasks;
 namespace Airport.Controllers
@@ -12,9 +13,11 @@ namespace Airport.Controllers
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public AdminController(ApplicationDbContext context)
+        private readonly AuditLogService _auditLogService;
+        public AdminController(ApplicationDbContext context, AuditLogService auditLogService)
         {
             _context = context;
+            _auditLogService = auditLogService;
         }
         public async Task<IActionResult> Index()
         {
@@ -106,6 +109,48 @@ namespace Airport.Controllers
             }
             return View(user);
         }
+        public async Task<IActionResult> AuditLogs(
+            string? username,
+            string? role,
+            string? actionDescription,
+            DateTime? dateFrom,
+            DateTime? dateTo,
+            int page = 1)
+        {
+            ViewData["IsAdminLayout"] = true;
+            const int pageSize = 50;
+
+            var (items, totalCount) = await _auditLogService.GetLogsAsync(
+                username, role, actionDescription, dateFrom, dateTo, page, pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+            ViewBag.TotalCount = totalCount;
+
+            ViewBag.FilterUsername = username;
+            ViewBag.FilterRole = role;
+            ViewBag.FilterActionDescription = actionDescription;
+            ViewBag.FilterDateFrom = dateFrom?.ToString("yyyy-MM-dd");
+            ViewBag.FilterDateTo = dateTo?.ToString("yyyy-MM-dd");
+
+            ViewBag.AllDescriptions = _auditLogService.GetAllDescriptions();
+            ViewBag.Roles = await _auditLogService.GetDistinctRolesAsync();
+            ViewBag.Stats = await _auditLogService.GetStatsAsync();
+
+            return View(items);
+        }
+
+        public async Task<IActionResult> AuditLogDetails(int? id)
+        {
+            ViewData["IsAdminLayout"] = true;
+            if (id == null) return NotFound();
+
+            var log = await _context.AuditLogs.FirstOrDefaultAsync(a => a.Id == id);
+            if (log == null) return NotFound();
+
+            return View(log);
+        }
+
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.Id == id);
