@@ -7,7 +7,7 @@ using Airport.Models;
 using Airport.Services;
 namespace Airport.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Dispatcher")]
     public class FlightController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -46,7 +46,7 @@ namespace Airport.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FlightNumber,AircraftId,DepartureTime,AvailableSeats,Price")] Flight flight)
+        public async Task<IActionResult> Create([Bind("Id,AircraftId,DepartureTime,Price")] Flight flight)
         {
             if (ModelState.IsValid)
             {
@@ -55,6 +55,7 @@ namespace Airport.Controllers
                 {
                     flight.AvailableSeats = aircraft.SeatCount;
                 }
+                flight.FlightNumber = "FL" + Guid.NewGuid().ToString("N")[..4].ToUpper();
                 _context.Add(flight);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
