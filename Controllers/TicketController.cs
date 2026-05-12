@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Airport.Data;
 using Airport.Models;
-using Airport.Services;
 using System.Security.Claims;
 namespace Airport.Controllers
 {
@@ -19,7 +18,7 @@ namespace Airport.Controllers
         public async Task<IActionResult> Index()
         {
             IQueryable<Ticket> ticketsQuery = _context.Tickets.Include(t => t.Flight);
-            if (!User.IsInRole("Admin"))
+            if (!User.IsInRole("Admin") && !User.IsInRole("Cashier"))
             {
                 var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (int.TryParse(userIdStr, out int userId))
@@ -36,7 +35,7 @@ namespace Airport.Controllers
             {
                 ParseDocumentNumber(ticket);
             }
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Cashier"))
             {
                 ViewData["IsAdminLayout"] = true;
             }
@@ -57,7 +56,7 @@ namespace Airport.Controllers
                 return NotFound();
             }
             ParseDocumentNumber(ticket);
-            if (!User.IsInRole("Admin"))
+            if (!User.IsInRole("Admin") && !User.IsInRole("Cashier"))
             {
                 var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (!int.TryParse(userIdStr, out int userId) || ticket.UserId != userId)
@@ -83,9 +82,10 @@ namespace Airport.Controllers
                 }
             }
         }
-        public IActionResult Create(int? flightId)
+        [Authorize(Roles = "Admin,Cashier,User")]
+        public async Task<IActionResult> Create(int? flightId)
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Cashier"))
             {
                 ViewData["IsAdminLayout"] = true;
             }
@@ -104,8 +104,8 @@ namespace Airport.Controllers
             { 
                 Date = DateTime.Today,
                 Time = DateTime.Now.TimeOfDay,
-                CashboxNumber = User.IsInRole("Admin") ? "1" : "0",
-                PurchaseSource = User.IsInRole("Admin") ? "Offline" : "Online"
+                CashboxNumber = (User.IsInRole("Admin") || User.IsInRole("Cashier")) ? "1" : "0",
+                PurchaseSource = (User.IsInRole("Admin") || User.IsInRole("Cashier")) ? "Offline" : "Online"
             };
             if (flightId.HasValue)
             {
@@ -115,9 +115,10 @@ namespace Airport.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Cashier,User")]
         public async Task<IActionResult> Create([Bind("Id,CashboxNumber,FlightId,Date,Time,PassengerName,PassportSeries,PassportNumber,ContactPhone,ContactEmail,SeatNumber,HasBaggage,HasMeal,HasInsurance")] Ticket ticket)
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Cashier"))
             {
                 ViewData["IsAdminLayout"] = true;
             }
@@ -147,7 +148,7 @@ namespace Airport.Controllers
                     var random = new Random();
                     ticket.SeatNumber = $"{random.Next(1, 31)}{(char)random.Next('A', 'G')}";
                 }
-                if (!User.IsInRole("Admin"))
+                if (!User.IsInRole("Admin") && !User.IsInRole("Cashier"))
                 {
                     var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (int.TryParse(userIdStr, out int userId))
@@ -185,7 +186,7 @@ namespace Airport.Controllers
                     .Select(f => new { f.Id, f.Price }).ToList());
             return View(ticket);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Cashier")]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewData["IsAdminLayout"] = true;
@@ -210,7 +211,7 @@ namespace Airport.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Cashier")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CashboxNumber,FlightId,Date,Time,PassengerName,PassportSeries,PassportNumber,ContactPhone,ContactEmail,SeatNumber,HasBaggage,HasMeal,HasInsurance")] Ticket ticket)
         {
             ViewData["IsAdminLayout"] = true;
@@ -288,7 +289,7 @@ namespace Airport.Controllers
                 _context.Flights.Select(f => new { f.Id, f.Price }).ToList());
             return View(ticket);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Cashier")]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewData["IsAdminLayout"] = true;
