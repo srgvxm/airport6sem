@@ -47,6 +47,15 @@ namespace Airport.Models
         [NotMapped] public static decimal BaggagePrice  => 1500m;
         [NotMapped] public static decimal MealPrice     => 500m;
         [NotMapped] public static decimal InsurancePrice => 800m;
+
+        [NotMapped]
+        public decimal ExtraServicesTotal =>
+            (HasBaggage ? BaggagePrice : 0) +
+            (HasMeal ? MealPrice : 0) +
+            (HasInsurance ? InsurancePrice : 0);
+
+        [NotMapped]
+        public decimal TotalPrice => (Flight?.Price ?? 0) + ExtraServicesTotal;
     }
 } 
 
