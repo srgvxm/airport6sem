@@ -42,7 +42,10 @@ else
                         {
                             <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
                         }
-                        <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="btn btn-sm btn-success">Купить билет</a>
+                        @if (!User.IsInRole("Dispatcher"))
+                        {
+                            <a asp-controller="Ticket" asp-action="Create" asp-route-flightId="@item.Id" class="btn btn-sm btn-success">Купить билет</a>
+                        }
                     </td>
                 </tr>
             }
