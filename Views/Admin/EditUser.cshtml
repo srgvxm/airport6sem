@@ -16,7 +16,7 @@
         <h5 class="admin-card-title">Редактирование данных пользователя</h5>
     </div>
     <div class="admin-card-body">
-        <form asp-action="EditUser">
+        <form asp-controller="Admin" asp-action="EditUser" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="row">
@@ -39,6 +39,8 @@
                 <label asp-for="Role" class="control-label">Роль</label>
                 <select asp-for="Role" class="admin-form-control">
                     <option value="User">Пользователь</option>
+                    <option value="Cashier">Кассир</option>
+                    <option value="Dispatcher">Диспетчер</option>
                     <option value="Admin">Администратор</option>
                 </select>
                 <span asp-validation-for="Role" class="text-danger"></span>
