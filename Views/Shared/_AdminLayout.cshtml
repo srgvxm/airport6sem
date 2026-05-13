@@ -16,8 +16,10 @@
             <button class="admin-menu-toggle me-3" id="menuToggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <a asp-controller="Admin" asp-action="Index" class="admin-header-brand">
-                <span style="color: #3498db;">Air</span>logistics <span class="ms-2 fs-6">Панель управления</span>
+            <a asp-controller="@(User.IsInRole("Admin") ? "Admin" : User.IsInRole("Cashier") ? "Ticket" : "Flight")"
+               asp-action="Index"
+               class="admin-header-brand">
+                <span class="admin-brand-air">Air</span><span class="admin-brand-logistics">logistics</span> <span class="ms-2 fs-6 admin-brand-subtitle">Панель управления</span>
             </a>
         </div>
         <div class="admin-header-user">
@@ -31,49 +33,64 @@
     </header>
     <aside class="admin-sidebar" id="adminSidebar">
         <ul class="admin-menu">
-            <li class="admin-menu-item">
-                <a asp-controller="Admin" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
-                    <i class="fas fa-tachometer-alt"></i> Дашборд
-                </a>
-            </li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="admin-menu-item">
+                    <a asp-controller="Admin" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
+                        <i class="fas fa-tachometer-alt"></i> Дашборд
+                    </a>
+                </li>
+            }
             <li class="admin-menu-group">Управление данными</li>
-            <li class="admin-menu-item">
-                <a asp-controller="Aircraft" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Aircraft" ? "active" : "")">
-                    <i class="fas fa-plane"></i> Самолеты
-                </a>
-            </li>
-            <li class="admin-menu-item">
-                <a asp-controller="Flight" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Flight" ? "active" : "")">
-                    <i class="fas fa-route"></i> Рейсы
-                </a>
-            </li>
-            <li class="admin-menu-item">
-                <a asp-controller="Landing" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Landing" ? "active" : "")">
-                    <i class="fas fa-plane-arrival"></i> Посадки
-                </a>
-            </li>
-            <li class="admin-menu-item">
-                <a asp-controller="Ticket" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Ticket" ? "active" : "")">
-                    <i class="fas fa-ticket-alt"></i> Билеты
-                </a>
-            </li>
-            <li class="admin-menu-group">Отчеты</li>
-            <li class="admin-menu-item">
-                <a asp-controller="Home" asp-action="TicketSalesReport" asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "TicketSalesReport" ? "active" : "")">
-                    <i class="fas fa-file-invoice-dollar"></i> Продажа билетов
-                </a>
-            </li>
-            <li class="admin-menu-item">
-                <a asp-controller="Home" asp-action="FlightLoadReport" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "FlightLoadReport" ? "active" : "")">
-                    <i class="fas fa-percentage"></i> Загруженность рейсов
-                </a>
-            </li>
-            <li class="admin-menu-group">Система</li>
-            <li class="admin-menu-item">
-                <a asp-controller="Admin" asp-action="AuditLogs" class="admin-menu-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "AuditLogs" || ViewContext.RouteData.Values["Action"]?.ToString() == "AuditLogDetails" ? "active" : "")">
-                    <i class="fas fa-clipboard-list"></i> Журнал действий
-                </a>
-            </li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="admin-menu-item">
+                    <a asp-controller="Aircraft" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Aircraft" ? "active" : "")">
+                        <i class="fas fa-plane"></i> Самолеты
+                    </a>
+                </li>
+            }
+            @if (User.IsInRole("Admin") || User.IsInRole("Dispatcher"))
+            {
+                <li class="admin-menu-item">
+                    <a asp-controller="Flight" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Flight" ? "active" : "")">
+                        <i class="fas fa-route"></i> Рейсы
+                    </a>
+                </li>
+                <li class="admin-menu-item">
+                    <a asp-controller="Landing" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Landing" ? "active" : "")">
+                        <i class="fas fa-plane-arrival"></i> Посадки
+                    </a>
+                </li>
+            }
+            @if (User.IsInRole("Admin") || User.IsInRole("Cashier"))
+            {
+                <li class="admin-menu-item">
+                    <a asp-controller="Ticket" asp-action="Index" class="admin-menu-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Ticket" ? "active" : "")">
+                        <i class="fas fa-ticket-alt"></i> Билеты
+                    </a>
+                </li>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="admin-menu-group">Отчеты</li>
+                <li class="admin-menu-item">
+                    <a asp-controller="Home" asp-action="TicketSalesReport" asp-route-startDate="@DateTime.Today.AddMonths(-1).ToString("yyyy-MM-dd")" asp-route-endDate="@DateTime.Today.ToString("yyyy-MM-dd")" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "TicketSalesReport" ? "active" : "")">
+                        <i class="fas fa-file-invoice-dollar"></i> Продажа билетов
+                    </a>
+                </li>
+                <li class="admin-menu-item">
+                    <a asp-controller="Home" asp-action="FlightLoadReport" class="admin-menu-link @(ViewContext.RouteData.Values["Action"].ToString() == "FlightLoadReport" ? "active" : "")">
+                        <i class="fas fa-percentage"></i> Загруженность рейсов
+                    </a>
+                </li>
+                <li class="admin-menu-group">Система</li>
+                <li class="admin-menu-item">
+                    <a asp-controller="Admin" asp-action="AuditLogs" class="admin-menu-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "AuditLogs" || ViewContext.RouteData.Values["Action"]?.ToString() == "AuditLogDetails" ? "active" : "")">
+                        <i class="fas fa-clipboard-list"></i> Журнал действий
+                    </a>
+                </li>
+            }
             <li class="admin-menu-item">
                 <a asp-controller="Home" asp-action="Index" class="admin-menu-link">
                     <i class="fas fa-home"></i> Вернуться на сайт
