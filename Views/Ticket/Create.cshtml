@@ -1,7 +1,7 @@
 @model Ticket
 @{
-    ViewData["Title"] = User.IsInRole("Admin") ? "Продажа билета" : "Покупка билета";
 }
+ViewData["Title"] = "Продажа билета";
 
 <h1>@ViewData["Title"]</h1>
 <hr />
@@ -11,18 +11,11 @@
         <form asp-action="Create" method="post" id="ticketForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            @if (User.IsInRole("Admin"))
-            {
-                <div class="form-group mb-3">
-                    <label asp-for="CashboxNumber" class="control-label">№ кассы</label>
-                    <input asp-for="CashboxNumber" class="form-control" />
-                    <span asp-validation-for="CashboxNumber" class="text-danger"></span>
-                </div>
-            }
-            else
-            {
-                <input type="hidden" asp-for="CashboxNumber" value="0" />
-            }
+            <div class="form-group mb-3">
+                <label asp-for="CashboxNumber" class="control-label">№ кассы</label>
+                <input asp-for="CashboxNumber" class="form-control" />
+                <span asp-validation-for="CashboxNumber" class="text-danger"></span>
+            </div>
 
             <div class="form-group mb-3">
                 <label asp-for="FlightId" class="control-label">Рейс</label>
@@ -140,22 +133,20 @@
                     <div class="form-group mb-3">
                         <label asp-for="Date" class="control-label">Дата покупки</label>
                         <input asp-for="Date" class="form-control" type="date"
-                               value="@DateTime.Today.ToString("yyyy-MM-dd")"
-                               readonly="@(!User.IsInRole("Admin"))" />
+                               value="@DateTime.Today.ToString("yyyy-MM-dd")" />
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="Time" class="control-label">Время покупки</label>
                         <input asp-for="Time" class="form-control" type="time"
-                               value="@DateTime.Now.ToString("HH:mm")"
-                               readonly="@(!User.IsInRole("Admin"))" />
+                               value="@DateTime.Now.ToString("HH:mm")" />
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <input type="submit" value="@(User.IsInRole("Admin") ? "Продать билет" : "Купить билет")"
+                <input type="submit" value="Продать билет"
                        class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Отмена</a>
             </div>
@@ -195,9 +186,10 @@
         var baggagePrice  = @Ticket.BaggagePrice;
         var mealPrice     = @Ticket.MealPrice;
         var insurancePrice = @Ticket.InsurancePrice;
+        var flightSelect = document.getElementById('flightSelect');
 
         function getFlightPrice() {
-            var id = parseInt(document.getElementById('flightSelect').value);
+            var id = parseInt(flightSelect.value);
             var match = flightPrices.find(function(f) { return f.id === id || f.Id === id; });
             return match ? (match.price || match.Price || 0) : null;
         }
@@ -235,7 +227,8 @@
             return n.toLocaleString('ru-RU');
         }
 
-        document.getElementById('flightSelect').addEventListener('change', updateTotal);
+        flightSelect.addEventListener('change', updateTotal);
+
         document.addEventListener('DOMContentLoaded', updateTotal);
     </script>
 }

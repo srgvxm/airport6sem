@@ -1,21 +1,17 @@
 @model Flight
-
 @{
     ViewData["Title"] = "Добавление рейса";
 }
-
 <h1>Добавление рейса</h1>
-
 <hr />
 <div class="row">
     <div class="col-md-6">
+        <div class="alert alert-info d-flex align-items-center gap-2 mb-3" style="font-size:0.9rem;">
+            <i class="fas fa-info-circle"></i>
+            Номер рейса будет сгенерирован автоматически при сохранении.
+        </div>
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group mb-3">
-                <label asp-for="FlightNumber" class="control-label">№ рейса</label>
-                <input asp-for="FlightNumber" class="form-control" />
-                <span asp-validation-for="FlightNumber" class="text-danger"></span>
-            </div>
             <div class="form-group mb-3">
                 <label asp-for="AircraftId" class="control-label">Самолет</label>
                 <select asp-for="AircraftId" class="form-control" asp-items="ViewBag.AircraftId"></select>
@@ -38,7 +34,6 @@
         </form>
     </div>
 </div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-} 
+}

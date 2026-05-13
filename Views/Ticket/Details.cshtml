@@ -1,6 +1,6 @@
 @model Ticket
 @{
-    ViewData["Title"] = User.IsInRole("Admin") ? "Детали билета" : "Мой билет";
+    ViewData["Title"] = "Детали билета";
     var extraTotal = (Model.HasBaggage ? Ticket.BaggagePrice : 0)
                    + (Model.HasMeal    ? Ticket.MealPrice    : 0)
                    + (Model.HasInsurance ? Ticket.InsurancePrice : 0);
@@ -14,11 +14,8 @@
         <dt class="col-sm-3">Номер билета</dt>
         <dd class="col-sm-9">@Html.DisplayFor(m => m.TicketNumber)</dd>
 
-        @if (User.IsInRole("Admin"))
-        {
-            <dt class="col-sm-3">№ кассы</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.CashboxNumber)</dd>
-        }
+        <dt class="col-sm-3">№ кассы</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.CashboxNumber)</dd>
 
         <dt class="col-sm-3">№ рейса</dt>
         <dd class="col-sm-9">@Html.DisplayFor(m => m.Flight.FlightNumber)</dd>
@@ -102,9 +99,6 @@
 </div>
 
 <div class="mt-3">
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
-    }
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
     <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
 </div>

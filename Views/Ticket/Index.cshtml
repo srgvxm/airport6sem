@@ -1,17 +1,10 @@
 @model IEnumerable<Ticket>
 @{
-    ViewData["Title"] = User.IsInRole("Admin") ? "Все билеты" : "Мои билеты";
+    ViewData["Title"] = "Все билеты";
 }
 <h1>@ViewData["Title"]</h1>
 <p>
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Create" class="btn btn-primary">Продать билет</a>
-    }
-    else
-    {
-        <a asp-controller="Home" asp-action="SearchFlights" class="btn btn-primary">Купить новый билет</a>
-    }
+    <a asp-action="Create" class="btn btn-primary">Продать билет</a>
 </p>
 <table class="table table-striped">
     <thead>
@@ -19,12 +12,9 @@
             <th>
                 Номер билета
             </th>
-            @if (User.IsInRole("Admin"))
-            {
-                <th>
-                    № кассы
-                </th>
-            }
+            <th>
+                № кассы
+            </th>
             <th>
                 № рейса
             </th>
@@ -37,10 +27,7 @@
             <th>
                 Место
             </th>
-            @if (User.IsInRole("Admin"))
-            {
-                <th>Действия</th>
-            }
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -49,12 +36,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.TicketNumber)
             </td>
-            @if (User.IsInRole("Admin"))
-            {
-                <td>
-                    @Html.DisplayFor(modelItem => item.CashboxNumber)
-                </td>
-            }
+            <td>
+                @Html.DisplayFor(modelItem => item.CashboxNumber)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Flight.FlightNumber)
             </td>
@@ -67,14 +51,11 @@
             <td>
                 @Html.DisplayFor(modelItem => item.SeatNumber)
             </td>
-            @if (User.IsInRole("Admin"))
-            {
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
-                    <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Ticket", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
-                </td>
-            }
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Изменить</a>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Детали</a>
+                <a href="javascript:void(0);" onclick="showDeleteConfirmation('@Url.Action("Delete", "Ticket", new { id = item.Id })')" class="btn btn-sm btn-danger">Удалить</a>
+            </td>
         </tr>
 }
     </tbody>
