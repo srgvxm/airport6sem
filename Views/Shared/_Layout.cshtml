@@ -22,25 +22,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Главная</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="SearchFlights">Поиск билетов</a>
-                        </li>
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        @if (User.Identity.IsAuthenticated &&
+                            (User.IsInRole("Admin") || User.IsInRole("Cashier") || User.IsInRole("Dispatcher")))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Админпанель</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Панель управления</a>
+                                }
+                                else if (User.IsInRole("Cashier"))
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Ticket" asp-action="Index">Панель управления</a>
+                                }
+                                else
+                                {
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Flight" asp-action="Index">Панель управления</a>
+                                }
                             </li>
+                        }
+                        else
+                        {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Aircraft" asp-action="Index">Самолеты</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Flight" asp-action="Index">Рейсы</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Landing" asp-action="Index">Посадки</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Ticket" asp-action="Index">Билеты</a>
+                                <a class="nav-link text-dark" asp-controller="Home" asp-action="SearchFlights">Поиск билетов</a>
                             </li>
                         }
                     </ul>
