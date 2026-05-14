@@ -7,7 +7,7 @@ using Airport.Models;
 using Airport.Services;
 namespace Airport.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Dispatcher")]
     public class LandingController : BaseController
     {
         private readonly ApplicationDbContext _context;
