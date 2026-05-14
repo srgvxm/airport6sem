@@ -86,6 +86,12 @@ namespace Airport.Controllers
             {
                 return NotFound();
             }
+            ModelState.Remove(nameof(Airport.Models.User.PasswordHash));
+            var allowedRoles = new[] { "User", "Cashier", "Dispatcher", "Admin" };
+            if (!allowedRoles.Contains(user.Role))
+            {
+                ModelState.AddModelError("Role", "Указана недопустимая роль.");
+            }
             user.PasswordHash = existingUser.PasswordHash;
             if (ModelState.IsValid)
             {
