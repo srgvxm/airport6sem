@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Airport.Services;
 namespace Airport.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Dispatcher")]
     public abstract class BaseController : Controller
     {
         protected readonly NotificationService _notificationService;
