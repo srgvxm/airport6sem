@@ -36,8 +36,23 @@
     color: white;
     text-decoration: none;
 }
-.admin-header-brand:hover {
+.admin-brand-air {
     color: var(--admin-accent);
+    transition: color 0.2s;
+}
+.admin-brand-logistics {
+    color: white;
+    transition: color 0.2s;
+}
+.admin-header-brand:hover .admin-brand-air {
+    color: white;
+}
+.admin-header-brand:hover .admin-brand-logistics {
+    color: var(--admin-accent);
+}
+.admin-brand-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 400;
 }
 .admin-header-user {
     display: flex;
@@ -168,6 +183,12 @@
     align-items: center;
     justify-content: center;
     gap: 5px;
+    text-decoration: none;
+}
+
+.admin-btn:hover,
+.admin-btn:focus {
+    text-decoration: none;
 }
 .admin-btn-primary {
     background-color: var(--admin-accent);
