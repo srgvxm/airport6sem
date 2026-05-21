@@ -63,7 +63,7 @@ namespace Airport.Controllers
                 .ToListAsync();
             ViewBag.StartDate = startDate.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endDate.ToString("yyyy-MM-dd");
-            ViewBag.TotalSales = tickets.Sum(t => t.Flight.Price);
+            ViewBag.TotalSales = tickets.Sum(t => t.TotalPrice);
             ViewBag.TicketCount = tickets.Count;
             return View(tickets);
         }
