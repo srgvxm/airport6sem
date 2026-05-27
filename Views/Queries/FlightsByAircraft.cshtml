@@ -1,11 +1,8 @@
 @model IEnumerable<Airport.ViewModels.FlightSummaryViewModel>
-
 @{
     ViewData["Title"] = "Рейсы по самолету";
 }
-
 <h1>@ViewData["Title"]</h1>
-
 <div class="row">
     <div class="col-md-12">
         <form method="get" class="mb-4">
@@ -16,7 +13,6 @@
                 </select>
             </div>
         </form>
-
         @if (Model.Any())
         {
             <table class="table table-striped">
@@ -51,3 +47,4 @@
         }
     </div>
 </div> 
+

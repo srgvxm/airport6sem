@@ -1,4 +1,3 @@
-<!-- Модальное окно подтверждения удаления -->
 <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -20,10 +19,10 @@
         </div>
     </div>
 </div>
-
 <script>
     function showDeleteConfirmation(deleteUrl) {
         document.getElementById('deleteForm').action = deleteUrl;
         $('#deleteConfirmationModal').modal('show');
     }
 </script> 
+

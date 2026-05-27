@@ -1,9 +1,7 @@
 @{
     ViewData["Title"] = "Проверка свободных мест";
 }
-
 <h1>@ViewData["Title"]</h1>
-
 <div class="row">
     <div class="col-md-6">
         <form method="get" class="mb-4">
@@ -14,7 +12,6 @@
                 </select>
             </div>
         </form>
-
         @if (ViewData["FlightNumber"] != null)
         {
             <div class="card">
@@ -40,3 +37,4 @@
         }
     </div>
 </div> 
+

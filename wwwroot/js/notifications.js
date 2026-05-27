@@ -3,7 +3,6 @@ function showNotification(title, message, type, isDismissible = true) {
     const notification = document.createElement('div');
     notification.className = `alert alert-${getAlertType(type)} ${isDismissible ? 'alert-dismissible' : ''} fade show`;
     notification.role = 'alert';
-
     let icon = '';
     switch (type) {
         case 'Success':
@@ -19,22 +18,18 @@ function showNotification(title, message, type, isDismissible = true) {
             icon = '<i class="fas fa-info-circle"></i>';
             break;
     }
-
     notification.innerHTML = `
         ${isDismissible ? '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' : ''}
         <strong>${icon} ${title}</strong>
         <p class="mb-0">${message}</p>
     `;
-
     notificationContainer.appendChild(notification);
-
     if (isDismissible) {
         setTimeout(() => {
             notification.remove();
         }, 5000);
     }
 }
-
 function getAlertType(type) {
     switch (type) {
         case 'Success':
@@ -49,7 +44,6 @@ function getAlertType(type) {
             return 'info';
     }
 }
-
 function createNotificationContainer() {
     const container = document.createElement('div');
     container.id = 'notification-container';
@@ -58,8 +52,6 @@ function createNotificationContainer() {
     document.body.appendChild(container);
     return container;
 }
-
-// Функция для отображения уведомлений из TempData
 function showNotificationsFromTempData() {
     const notifications = document.getElementById('temp-notifications');
     if (notifications) {
@@ -69,6 +61,5 @@ function showNotificationsFromTempData() {
         });
     }
 }
-
-// Вызываем функцию при загрузке страницы
 document.addEventListener('DOMContentLoaded', showNotificationsFromTempData); 
+

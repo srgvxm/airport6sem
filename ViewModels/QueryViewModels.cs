@@ -9,7 +9,6 @@ namespace Airport.ViewModels
         public int TotalSeats { get; set; }
         public double LoadPercentage { get; set; }
     }
-
     public class ExpensiveFlightViewModel
     {
         public string FlightNumber { get; set; } = null!;
@@ -18,7 +17,6 @@ namespace Airport.ViewModels
         public int TicketCount { get; set; }
         public decimal TotalRevenue { get; set; }
     }
-
     public class UnderutilizedFlightViewModel
     {
         public string FlightNumber { get; set; } = null!;
@@ -29,3 +27,4 @@ namespace Airport.ViewModels
         public double EmptyPercentage { get; set; }
     }
 } 
+

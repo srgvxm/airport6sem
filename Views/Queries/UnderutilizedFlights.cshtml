@@ -1,11 +1,8 @@
 @model IEnumerable<Airport.ViewModels.UnderutilizedFlightViewModel>
-
 @{
     ViewData["Title"] = "Рейсы с низкой загрузкой";
 }
-
 <h1>@ViewData["Title"]</h1>
-
 <div class="row">
     <div class="col-md-12">
         <form method="get" class="mb-4">
@@ -15,7 +12,6 @@
                        value="@ViewData["MinEmptySeats"]" min="1" onchange="this.form.submit()">
             </div>
         </form>
-
         @if (Model.Any())
         {
             <table class="table table-striped">
@@ -58,3 +54,4 @@
         }
     </div>
 </div> 
+

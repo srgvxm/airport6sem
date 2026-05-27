@@ -8,7 +8,6 @@ namespace Airport.ViewModels
         public int TotalSeats { get; set; }
         public int FlightsCount { get; set; }
     }
-
     public class FlightSummaryViewModel
     {
         public int Id { get; set; }
@@ -19,13 +18,11 @@ namespace Airport.ViewModels
         public int TotalSeats { get; set; }
         public List<LandingSummaryViewModel> Landings { get; set; } = new();
     }
-
     public class LandingSummaryViewModel
     {
         public string Location { get; set; } = null!;
         public TimeSpan Time { get; set; }
     }
-
     public class TicketSummaryViewModel
     {
         public int Id { get; set; }
@@ -37,3 +34,4 @@ namespace Airport.ViewModels
         public DateTime DepartureTime { get; set; }
     }
 } 
+

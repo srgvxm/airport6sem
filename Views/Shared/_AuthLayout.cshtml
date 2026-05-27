@@ -19,17 +19,14 @@
     </style>
 </head>
 <body>
-    <!-- Видео на фоне -->
     <div class="video-background">
         <video autoplay loop muted playsinline>
             <source src="~/videos/4a5d9fcee49ebb037683ca334f12c1c3 (online-video-cutter.com).mp4" type="video/mp4">
         </video>
     </div>
-    
     <main role="main">
         @RenderBody()
     </main>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -37,3 +34,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html> 
+

@@ -1,11 +1,8 @@
 @model Landing
-
 @{
     ViewData["Title"] = "Редактирование посадки";
 }
-
 <h1>Редактирование посадки</h1>
-
 <hr />
 <div class="row">
     <div class="col-md-6">
@@ -34,7 +31,7 @@
         </form>
     </div>
 </div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 } 
+

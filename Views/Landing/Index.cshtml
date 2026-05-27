@@ -1,11 +1,8 @@
 @model IEnumerable<Landing>
-
 @{
     ViewData["Title"] = "Посадки";
 }
-
 <h1>Посадки</h1>
-
 @if (ViewBag.FlightId != null)
 {
     <h4>@ViewBag.FlightInfo</h4>
@@ -20,7 +17,6 @@ else
         <a asp-action="Create" class="btn btn-primary">Добавить посадку</a>
     </p>
 }
-
 <table class="table">
     <thead>
         <tr>
@@ -56,3 +52,4 @@ else
 }
     </tbody>
 </table> 
+

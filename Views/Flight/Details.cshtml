@@ -1,11 +1,8 @@
 @model Flight
-
 @{
     ViewData["Title"] = "Детали рейса";
 }
-
 <h1>Детали рейса</h1>
-
 <div>
     <hr />
     <dl class="row">
@@ -47,13 +44,11 @@
         </dd>
     </dl>
 </div>
-
 <div class="mb-3">
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактировать</a>
     <a asp-controller="Landing" asp-action="Index" asp-route-flightId="@Model.Id" class="btn btn-info">Управление посадками</a>
     <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
 </div>
-    
 @if (Model.Landings != null && Model.Landings.Any())
 {
     <h4>Посадки</h4>
@@ -79,7 +74,6 @@
             }
         </tbody>
     </table>
-    
     <p>
         <a asp-controller="Landing" asp-action="Create" asp-route-flightId="@Model.Id" class="btn btn-primary">Добавить посадку</a>
     </p>
@@ -91,3 +85,4 @@ else
         <a asp-controller="Landing" asp-action="Create" asp-route-flightId="@Model.Id" class="btn btn-primary">Добавить посадку</a>
     </div>
 } 
+
